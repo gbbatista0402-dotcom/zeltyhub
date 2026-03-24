@@ -13,7 +13,10 @@ local Window = Rayfield:CreateWindow({
    LoadingSubtitle = "by gbbatista",
    ConfigurationSaving = { Enabled = true, FolderName = "ZeltyHubData", FileName = "ZeltyConfig" },
    Theme = "Ocean",
-   KeySystem = false
+   KeySystem = false,
+   -- Bloqueia os botões extras que travam o menu no Xeno
+   DisableRayfieldPrompts = true,
+   DisableBuildWarnings = true
 })
 
 local Tab1 = Window:CreateTab("LuckySpin", 4483362458) 
@@ -26,7 +29,7 @@ Tab1:CreateToggle({
    Callback = function(Value)
       AutoLuckEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "🍀 LUCKY SPIN", Content = "Farming de recompensas ligado!", Duration = 3})
+          Rayfield:Notify({Title = "🍀 LUCKY SPIN", Content = "Farm de recompensas ativado!", Duration = 3})
           task.spawn(function()
               local i = 1
               while AutoLuckEnabled do
@@ -44,21 +47,7 @@ Tab1:CreateToggle({
    CurrentValue = true,
    Flag = "Toggle2",
    Callback = function(Value)
-      if Value then Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativa (80% seguro)", Duration = 4}) end
-   end,
-})
-
-local PityEnabled = false
-Tab1:CreateToggle({
-   Name = "⚡ Pity Bugada",
-   CurrentValue = false,
-   Flag = "Toggle3",
-   Callback = function(Value)
-      PityEnabled = Value
-      if Value then
-          Rayfield:Notify({Title = "⚡ PITY BUG", Content = "Reset de pity ativado!", Duration = 3})
-          task.spawn(function() while PityEnabled do pcall(function() ClaimReward:InvokeServer(1) end) task.wait(0.05) end end)
-      end
+      if Value then Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativa", Duration = 4}) end
    end,
 })
 
@@ -72,14 +61,14 @@ Tab2:CreateToggle({
    Callback = function(Value)
       AnonEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Ocultando seu nick localmente...", Duration = 3})
+          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Tags de nome desativadas!", Duration = 3})
           task.spawn(function()
               while AnonEnabled do
                   pcall(function()
-                      Player.DisplayName = "ZeltyPlayer"
+                      Player.DisplayName = "Zelty"
                       if Player.Character and Player.Character:FindFirstChild("Head") then
                           for _, v in pairs(Player.Character.Head:GetChildren()) do
-                              if v:IsA("BillboardGui") or v:IsA("TextLabel") then v.Enabled = false end
+                              if v:IsA("BillboardGui") then v.Enabled = false end
                           end
                       end
                   end)
@@ -98,13 +87,13 @@ Tab2:CreateToggle({
    Callback = function(Value)
       AntiAFKEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Anti-Kick ativado com sucesso!", Duration = 3})
-          if getgenv().AntiAFK_Zelty then getgenv().AntiAFK_Zelty:Disconnect() end
-          getgenv().AntiAFK_Zelty = Player.Idled:Connect(function()
+          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Simulando atividade no Xeno...", Duration = 3})
+          if getgenv().AFK_Zelty then getgenv().AFK_Zelty:Disconnect() end
+          getgenv().AFK_Zelty = Player.Idled:Connect(function()
               if AntiAFKEnabled then
-                  VIM:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
+                  VIM:SendKeyEvent(true, Enum.KeyCode.RightControl, false, game)
                   task.wait(0.1)
-                  VIM:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
+                  VIM:SendKeyEvent(false, Enum.KeyCode.RightControl, false, game)
               end
           end)
       end
@@ -120,11 +109,9 @@ Tab3:CreateDropdown({
    MultipleOptions = false,
    Flag = "ThemeDrop",
    Callback = function(Option)
-      local selectedTheme = type(Option) == "table" and Option[1] or Option
-      -- Usando task.spawn para evitar o Callback Error no Xeno
+      local cor = type(Option) == "table" and Option[1] or Option
       task.spawn(function()
-          pcall(function() Rayfield:ChangeTheme(selectedTheme) end)
-          pcall(function() Window:ModifyTheme(selectedTheme) end)
+          pcall(function() Rayfield:ChangeTheme(cor) end)
       end)
    end,
 })
@@ -134,17 +121,9 @@ Tab3:CreateButton({
    Callback = function() Rayfield:Destroy() end,
 })
 
-Tab3:CreateButton({
-   Name = "Copiar Link do Discord",
-   Callback = function()
-      setclipboard("https://discord.gg/zeltyhub")
-      Rayfield:Notify({Title = "Discord", Content = "Link copiado para o seu teclado!", Duration = 3})
-   end,
-})
-
 Rayfield:Notify({
    Title = "Zelty Hub",
-   Content = "Carregado e Pronto para o Xeno!",
+   Content = "Menu destravado e pronto!",
    Duration = 3,
    Image = 4483362458,
 })
