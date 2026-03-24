@@ -41,9 +41,7 @@ Tab1:CreateToggle({
    CurrentValue = true,
    Flag = "Toggle2",
    Callback = function(Value)
-      if Value then 
-          Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativada (80% seguro)", Duration = 4}) 
-      end
+      if Value then Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativada (80% seguro)", Duration = 4}) end
    end,
 })
 
@@ -63,14 +61,19 @@ Tab1:CreateToggle({
 
 local Tab2 = Window:CreateTab("Jogador", 4483362458)
 
+local AnonEnabled = false
 Tab2:CreateToggle({
    Name = "👤 Modo Anônimo",
    CurrentValue = false,
    Flag = "Toggle4",
    Callback = function(Value)
+      AnonEnabled = Value
       if Value then
-          pcall(function() Player.DisplayName = "ZeltyUser_"..math.random(100,999) end)
-          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Nick ocultado!", Duration = 3})
+          pcall(function() 
+             Player.Character.Head.NameTag.TextLabel.Text = "Anônimo"
+             Player.DisplayName = "Anonymous" 
+          end)
+          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Ativado localmente!", Duration = 3})
       end
    end,
 })
@@ -83,10 +86,19 @@ Tab2:CreateToggle({
    Callback = function(Value)
       AntiAFKEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Proteção ativada!", Duration = 3})
-          Player.Idled:Connect(function()
-              if AntiAFKEnabled then VirtualUser:CaptureController() VirtualUser:ClickButton2(Vector2.new()) end
+          -- MÉTODO NOVO E INFALÍVEL DE ANTI-AFK
+          if getgenv().AntiAFKConn then getgenv().AntiAFKConn:Disconnect() end
+          getgenv().AntiAFKConn = Player.Idled:Connect(function()
+              if AntiAFKEnabled then
+                  VirtualUser:CaptureController()
+                  VirtualUser:ClickButton2(Vector2.new())
+                  -- Simula um leve movimento de câmera para garantir
+                  game:GetService("VirtualInputManager"):SendKeyEvent(true, "RightControl", false, game)
+                  task.wait(0.5)
+                  game:GetService("VirtualInputManager"):SendKeyEvent(false, "RightControl", false, game)
+              end
           end)
+          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Sistema de pulo de ociosidade ativo!", Duration = 3})
       end
    end,
 })
@@ -100,7 +112,7 @@ Tab3:CreateDropdown({
    MultipleOptions = false,
    Flag = "ThemeDropdown",
    Callback = function(Option)
-      Window:ModifyTheme(Option[1])
+      Window:SetTheme(Option[1])
    end,
 })
 
@@ -114,14 +126,14 @@ Tab3:CreateButton({
 Tab3:CreateButton({
    Name = "Copiar Link do Discord",
    Callback = function()
-      setclipboard("https://discord.gg/SEU_LINK_AQUI")
+      setclipboard("https://discord.gg/zeltyhub")
       Rayfield:Notify({Title = "Discord", Content = "Link copiado!", Duration = 3})
    end,
 })
 
 Rayfield:Notify({
    Title = "Zelty Hub",
-   Content = "Carregado com sucesso!",
+   Content = "Carregado com Anti-AFK Turbo!",
    Duration = 3,
    Image = 4483362458,
 })
