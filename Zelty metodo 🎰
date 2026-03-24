@@ -6,7 +6,7 @@ local Player = Players.LocalPlayer
 local ClaimReward = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("ChallengeService"):WaitForChild("RF"):WaitForChild("ClaimReward")
 
 local Window = Rayfield:CreateWindow({
-   Name = "Volleyball Legends | Cerberus",
+   Name = "Volleyball Legends | Zelty Hub",
    LoadingTitle = "Zelty Hub Turbo",
    LoadingSubtitle = "by gbbatista",
    ConfigurationSaving = { Enabled = true, FolderName = "ZeltyHubData", FileName = "ZeltyConfig" },
@@ -41,7 +41,9 @@ Tab1:CreateToggle({
    CurrentValue = true,
    Flag = "Toggle2",
    Callback = function(Value)
-      if Value then Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativada (80% seguro)", Duration = 4}) end
+      if Value then 
+          Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativada (80% seguro)", Duration = 4}) 
+      end
    end,
 })
 
@@ -96,6 +98,7 @@ Tab3:CreateDropdown({
    Options = {"Ocean","Amethyst","Green","Amber","DarkBlue"},
    CurrentOption = {"Ocean"},
    MultipleOptions = false,
+   Flag = "ThemeDropdown",
    Callback = function(Option)
       Window:ModifyTheme(Option[1])
    end,
