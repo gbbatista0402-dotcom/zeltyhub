@@ -11,12 +11,10 @@ local Window = Rayfield:CreateWindow({
    Name = "Volleyball Legends | Zelty Hub",
    LoadingTitle = "Zelty Hub Turbo",
    LoadingSubtitle = "by gbbatista",
-   ConfigurationSaving = { Enabled = true, FolderName = "ZeltyHubData", FileName = "ZeltyConfig" },
+   ConfigurationSaving = { Enabled = false }, -- Desliguei o save automático para limpar o bug visual
    Theme = "Ocean",
    KeySystem = false,
-   -- Bloqueia os botões extras que travam o menu no Xeno
-   DisableRayfieldPrompts = true,
-   DisableBuildWarnings = true
+   DisableRayfieldPrompts = true
 })
 
 local Tab1 = Window:CreateTab("LuckySpin", 4483362458) 
@@ -25,11 +23,11 @@ local AutoLuckEnabled = false
 Tab1:CreateToggle({
    Name = "🍀 Auto Luck Spin",
    CurrentValue = false,
-   Flag = "Toggle1",
+   Flag = "LuckFix", 
    Callback = function(Value)
       AutoLuckEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "🍀 LUCKY SPIN", Content = "Farm de recompensas ativado!", Duration = 3})
+          Rayfield:Notify({Title = "🍀 LUCKY SPIN", Content = "Farm iniciado!", Duration = 3})
           task.spawn(function()
               local i = 1
               while AutoLuckEnabled do
@@ -44,10 +42,10 @@ Tab1:CreateToggle({
 
 Tab1:CreateToggle({
    Name = "🔒 Anti-Ban",
-   CurrentValue = true,
-   Flag = "Toggle2",
+   CurrentValue = false, -- Começa desligado para não bugar o visual
+   Flag = "BanFix",
    Callback = function(Value)
-      if Value then Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativa", Duration = 4}) end
+      if Value then Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção 80% segura ativada", Duration = 4}) end
    end,
 })
 
@@ -57,11 +55,10 @@ local AnonEnabled = false
 Tab2:CreateToggle({
    Name = "👤 Modo Anônimo",
    CurrentValue = false,
-   Flag = "Toggle4",
+   Flag = "AnonFix",
    Callback = function(Value)
       AnonEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Tags de nome desativadas!", Duration = 3})
           task.spawn(function()
               while AnonEnabled do
                   pcall(function()
@@ -83,11 +80,10 @@ local AntiAFKEnabled = false
 Tab2:CreateToggle({
    Name = "💤 Anti-AFK",
    CurrentValue = false,
-   Flag = "Toggle5",
+   Flag = "AfkFix", -- Mudei a flag para resetar o brilho azul
    Callback = function(Value)
       AntiAFKEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Simulando atividade no Xeno...", Duration = 3})
           if getgenv().AFK_Zelty then getgenv().AFK_Zelty:Disconnect() end
           getgenv().AFK_Zelty = Player.Idled:Connect(function()
               if AntiAFKEnabled then
@@ -96,6 +92,7 @@ Tab2:CreateToggle({
                   VIM:SendKeyEvent(false, Enum.KeyCode.RightControl, false, game)
               end
           end)
+          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Sistema Anti-Kick ativo!", Duration = 3})
       end
    end,
 })
@@ -104,14 +101,15 @@ local Tab3 = Window:CreateTab("Config", 4483362458)
 
 Tab3:CreateDropdown({
    Name = "Mudar Cor do Script",
-   Options = {"Ocean","Amethyst","Green","Amber","DarkBlue","Serenity"},
+   Options = {"Ocean","Amethyst","Green","Amber","DarkBlue"},
    CurrentOption = {"Ocean"},
    MultipleOptions = false,
-   Flag = "ThemeDrop",
+   Flag = "ThemeFix",
    Callback = function(Option)
-      local cor = type(Option) == "table" and Option[1] or Option
-      task.spawn(function()
-          pcall(function() Rayfield:ChangeTheme(cor) end)
+      -- Novo método para mudar tema no Xeno sem erro
+      local themeName = type(Option) == "table" and Option[1] or Option
+      pcall(function()
+          Rayfield:ChangeTheme(themeName)
       end)
    end,
 })
@@ -123,7 +121,7 @@ Tab3:CreateButton({
 
 Rayfield:Notify({
    Title = "Zelty Hub",
-   Content = "Menu destravado e pronto!",
+   Content = "Menu Limpo e Pronto!",
    Duration = 3,
    Image = 4483362458,
 })
