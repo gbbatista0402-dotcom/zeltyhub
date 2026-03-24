@@ -2,7 +2,9 @@ local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local VirtualUser = game:GetService("VirtualUser")
+local VIM = game:GetService("VirtualInputManager")
 local Player = Players.LocalPlayer
+
 local ClaimReward = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("ChallengeService"):WaitForChild("RF"):WaitForChild("ClaimReward")
 
 local Window = Rayfield:CreateWindow({
@@ -26,10 +28,11 @@ Tab1:CreateToggle({
       if Value then
           Rayfield:Notify({Title = "🍀 LUCKY SPIN", Content = "Auto Luck Spin ativado!", Duration = 3})
           task.spawn(function()
-              for i = 1, 12983821029 do
-                  if not AutoLuckEnabled then break end
-                  task.spawn(function() pcall(function() ClaimReward:InvokeServer(unpack({i})) end) end)
-                  task.wait() 
+              local i = 1
+              while AutoLuckEnabled do
+                  pcall(function() ClaimReward:InvokeServer(unpack({i})) end)
+                  i = (i >= 500) and 1 or i + 1
+                  task.wait(0.01) 
               end
           end)
       end
@@ -41,7 +44,7 @@ Tab1:CreateToggle({
    CurrentValue = true,
    Flag = "Toggle2",
    Callback = function(Value)
-      if Value then Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativada (80% seguro)", Duration = 4}) end
+      if Value then Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativa (80% seguro)", Duration = 4}) end
    end,
 })
 
@@ -53,8 +56,8 @@ Tab1:CreateToggle({
    Callback = function(Value)
       PityEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "⚡ PITY BUG", Content = "Reset infinito de pity ativado!", Duration = 3})
-          task.spawn(function() while PityEnabled do pcall(function() ClaimReward:InvokeServer(1) end) task.wait() end end)
+          Rayfield:Notify({Title = "⚡ PITY BUG", Content = "Reset infinito de pity ativo!", Duration = 3})
+          task.spawn(function() while PityEnabled do pcall(function() ClaimReward:InvokeServer(1) end) task.wait(0.05) end end)
       end
    end,
 })
@@ -69,11 +72,20 @@ Tab2:CreateToggle({
    Callback = function(Value)
       AnonEnabled = Value
       if Value then
-          pcall(function() 
-             Player.Character.Head.NameTag.TextLabel.Text = "Anônimo"
-             Player.DisplayName = "Anonymous" 
+          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Tentando ocultar seu nick...", Duration = 3})
+          task.spawn(function()
+              while AnonEnabled do
+                  pcall(function()
+                      Player.DisplayName = "Anonymous"
+                      if Player.Character and Player.Character:FindFirstChild("Head") then
+                          for _, v in pairs(Player.Character.Head:GetChildren()) do
+                              if v:IsA("BillboardGui") or v:IsA("TextLabel") then v.Enabled = false end
+                          end
+                      end
+                  end)
+                  task.wait(1)
+              end
           end)
-          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Ativado localmente!", Duration = 3})
       end
    end,
 })
@@ -86,19 +98,15 @@ Tab2:CreateToggle({
    Callback = function(Value)
       AntiAFKEnabled = Value
       if Value then
-          -- MÉTODO NOVO E INFALÍVEL DE ANTI-AFK
+          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Ativado: O Xeno vai segurar o jogo!", Duration = 3})
           if getgenv().AntiAFKConn then getgenv().AntiAFKConn:Disconnect() end
           getgenv().AntiAFKConn = Player.Idled:Connect(function()
               if AntiAFKEnabled then
-                  VirtualUser:CaptureController()
-                  VirtualUser:ClickButton2(Vector2.new())
-                  -- Simula um leve movimento de câmera para garantir
-                  game:GetService("VirtualInputManager"):SendKeyEvent(true, "RightControl", false, game)
-                  task.wait(0.5)
-                  game:GetService("VirtualInputManager"):SendKeyEvent(false, "RightControl", false, game)
+                  VIM:SendKeyEvent(true, Enum.KeyCode.RightControl, false, game)
+                  task.wait(0.1)
+                  VIM:SendKeyEvent(false, Enum.KeyCode.RightControl, false, game)
               end
           end)
-          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Sistema de pulo de ociosidade ativo!", Duration = 3})
       end
    end,
 })
@@ -107,20 +115,21 @@ local Tab3 = Window:CreateTab("Config", 4483362458)
 
 Tab3:CreateDropdown({
    Name = "Mudar Cor do Script",
-   Options = {"Ocean","Amethyst","Green","Amber","DarkBlue"},
+   Options = {"Ocean","Amethyst","Green","Amber","DarkBlue","Serenity"},
    CurrentOption = {"Ocean"},
    MultipleOptions = false,
-   Flag = "ThemeDropdown",
+   Flag = "ThemeDrop",
    Callback = function(Option)
-      Window:SetTheme(Option[1])
+      local themeName = Option[1] -- O Rayfield retorna uma tabela, pegamos o primeiro item
+      pcall(function()
+          Rayfield:ChangeTheme(themeName)
+      end)
    end,
 })
 
 Tab3:CreateButton({
    Name = "Fechar Script (Destroy)",
-   Callback = function()
-      Rayfield:Destroy()
-   end,
+   Callback = function() Rayfield:Destroy() end,
 })
 
 Tab3:CreateButton({
@@ -133,7 +142,7 @@ Tab3:CreateButton({
 
 Rayfield:Notify({
    Title = "Zelty Hub",
-   Content = "Carregado com Anti-AFK Turbo!",
+   Content = "Carregado no Xeno!",
    Duration = 3,
    Image = 4483362458,
 })
