@@ -26,12 +26,12 @@ Tab1:CreateToggle({
    Callback = function(Value)
       AutoLuckEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "🍀 LUCKY SPIN", Content = "Auto Luck Spin ativado!", Duration = 3})
+          Rayfield:Notify({Title = "🍀 LUCKY SPIN", Content = "Farming de recompensas ligado!", Duration = 3})
           task.spawn(function()
               local i = 1
               while AutoLuckEnabled do
                   pcall(function() ClaimReward:InvokeServer(unpack({i})) end)
-                  i = (i >= 500) and 1 or i + 1
+                  i = (i >= 1000) and 1 or i + 1
                   task.wait(0.01) 
               end
           end)
@@ -56,7 +56,7 @@ Tab1:CreateToggle({
    Callback = function(Value)
       PityEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "⚡ PITY BUG", Content = "Reset infinito de pity ativo!", Duration = 3})
+          Rayfield:Notify({Title = "⚡ PITY BUG", Content = "Reset de pity ativado!", Duration = 3})
           task.spawn(function() while PityEnabled do pcall(function() ClaimReward:InvokeServer(1) end) task.wait(0.05) end end)
       end
    end,
@@ -72,11 +72,11 @@ Tab2:CreateToggle({
    Callback = function(Value)
       AnonEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Tentando ocultar seu nick...", Duration = 3})
+          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Ocultando seu nick localmente...", Duration = 3})
           task.spawn(function()
               while AnonEnabled do
                   pcall(function()
-                      Player.DisplayName = "Anonymous"
+                      Player.DisplayName = "ZeltyPlayer"
                       if Player.Character and Player.Character:FindFirstChild("Head") then
                           for _, v in pairs(Player.Character.Head:GetChildren()) do
                               if v:IsA("BillboardGui") or v:IsA("TextLabel") then v.Enabled = false end
@@ -98,13 +98,13 @@ Tab2:CreateToggle({
    Callback = function(Value)
       AntiAFKEnabled = Value
       if Value then
-          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Ativado: O Xeno vai segurar o jogo!", Duration = 3})
-          if getgenv().AntiAFKConn then getgenv().AntiAFKConn:Disconnect() end
-          getgenv().AntiAFKConn = Player.Idled:Connect(function()
+          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Anti-Kick ativado com sucesso!", Duration = 3})
+          if getgenv().AntiAFK_Zelty then getgenv().AntiAFK_Zelty:Disconnect() end
+          getgenv().AntiAFK_Zelty = Player.Idled:Connect(function()
               if AntiAFKEnabled then
-                  VIM:SendKeyEvent(true, Enum.KeyCode.RightControl, false, game)
+                  VIM:SendKeyEvent(true, Enum.KeyCode.Space, false, game)
                   task.wait(0.1)
-                  VIM:SendKeyEvent(false, Enum.KeyCode.RightControl, false, game)
+                  VIM:SendKeyEvent(false, Enum.KeyCode.Space, false, game)
               end
           end)
       end
@@ -120,9 +120,11 @@ Tab3:CreateDropdown({
    MultipleOptions = false,
    Flag = "ThemeDrop",
    Callback = function(Option)
-      local themeName = Option[1] -- O Rayfield retorna uma tabela, pegamos o primeiro item
-      pcall(function()
-          Rayfield:ChangeTheme(themeName)
+      local selectedTheme = type(Option) == "table" and Option[1] or Option
+      -- Usando task.spawn para evitar o Callback Error no Xeno
+      task.spawn(function()
+          pcall(function() Rayfield:ChangeTheme(selectedTheme) end)
+          pcall(function() Window:ModifyTheme(selectedTheme) end)
       end)
    end,
 })
@@ -136,13 +138,13 @@ Tab3:CreateButton({
    Name = "Copiar Link do Discord",
    Callback = function()
       setclipboard("https://discord.gg/zeltyhub")
-      Rayfield:Notify({Title = "Discord", Content = "Link copiado!", Duration = 3})
+      Rayfield:Notify({Title = "Discord", Content = "Link copiado para o seu teclado!", Duration = 3})
    end,
 })
 
 Rayfield:Notify({
    Title = "Zelty Hub",
-   Content = "Carregado no Xeno!",
+   Content = "Carregado e Pronto para o Xeno!",
    Duration = 3,
    Image = 4483362458,
 })
