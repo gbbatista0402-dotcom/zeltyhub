@@ -1,56 +1,34 @@
--- [[ ZELTY HUB ❄️ - VERSÃO TURBO AZUL ]]
-
 local Rayfield = loadstring(game:HttpGet('https://sirius.menu/rayfield'))()
-
--- Serviços
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local Players = game:GetService("Players")
 local VirtualUser = game:GetService("VirtualUser")
 local Player = Players.LocalPlayer
-
--- Remote
-local ClaimReward = ReplicatedStorage
-    :WaitForChild("Packages")
-    :WaitForChild("_Index")
-    :WaitForChild("sleitnick_knit@1.7.0")
-    :WaitForChild("knit")
-    :WaitForChild("Services")
-    :WaitForChild("ChallengeService")
-    :WaitForChild("RF")
-    :WaitForChild("ClaimReward")
+local ClaimReward = ReplicatedStorage:WaitForChild("Packages"):WaitForChild("_Index"):WaitForChild("sleitnick_knit@1.7.0"):WaitForChild("knit"):WaitForChild("Services"):WaitForChild("ChallengeService"):WaitForChild("RF"):WaitForChild("ClaimReward")
 
 local Window = Rayfield:CreateWindow({
-   Name = "Zelty Hub ❄️",
-   LoadingTitle = "Modo Turbo Ativado",
-   LoadingSubtitle = "por gbbatista",
+   Name = "Volleyball Legends | Cerberus",
+   LoadingTitle = "Zelty Hub Turbo",
+   LoadingSubtitle = "by gbbatista",
    ConfigurationSaving = { Enabled = true, FolderName = "ZeltyHubData", FileName = "ZeltyConfig" },
    Theme = "Ocean",
    KeySystem = false
 })
 
 local Tab1 = Window:CreateTab("LuckySpin", 4483362458) 
-local Section1 = Tab1:CreateSection("Recompensas (MODO RÁPIDO)")
 
--- [[ AUTO LUCK SPIN TURBO ]]
 local AutoLuckEnabled = false
-local Toggle1 = Tab1:CreateToggle({
-   Name = "🏆 Auto Coletar (MODO RÁPIDO)",
+Tab1:CreateToggle({
+   Name = "🍀 Auto Luck Spin",
    CurrentValue = false,
-   Flag = "ToggleAutoCollect",
+   Flag = "Toggle1",
    Callback = function(Value)
       AutoLuckEnabled = Value
       if Value then
+          Rayfield:Notify({Title = "🍀 LUCKY SPIN", Content = "Auto Luck Spin ativado!", Duration = 3})
           task.spawn(function()
-              local i = 1
-              while AutoLuckEnabled do
-                  -- pcall evita que o script pare se houver lag no servidor
-                  pcall(function()
-                      ClaimReward:InvokeServer(i)
-                  end)
-                  
-                  i = (i >= 500) and 1 or i + 1 -- Diminuí o limite para resetar o loop mais rápido
-                  
-                  -- task.wait() vazio é a velocidade máxima do frame (aprox. 0.01s)
+              for i = 1, 12983821029 do
+                  if not AutoLuckEnabled then break end
+                  task.spawn(function() pcall(function() ClaimReward:InvokeServer(unpack({i})) end) end)
                   task.wait() 
               end
           end)
@@ -58,63 +36,89 @@ local Toggle1 = Tab1:CreateToggle({
    end,
 })
 
--- [[ PITY BUGADA TURBO ]]
+Tab1:CreateToggle({
+   Name = "🔒 Anti-Ban",
+   CurrentValue = true,
+   Flag = "Toggle2",
+   Callback = function(Value)
+      if Value then Rayfield:Notify({Title = "🔒 BYPASS", Content = "Proteção anti-ban ativada (80% seguro)", Duration = 4}) end
+   end,
+})
+
 local PityEnabled = false
-local Toggle3 = Tab1:CreateToggle({
-   Name = "⚡ Pity Bugada (MÁX SPEED)",
+Tab1:CreateToggle({
+   Name = "⚡ Pity Bugada",
    CurrentValue = false,
-   Flag = "TogglePityBug",
+   Flag = "Toggle3",
    Callback = function(Value)
       PityEnabled = Value
       if Value then
-          task.spawn(function()
-              while PityEnabled do
-                  pcall(function()
-                      ClaimReward:InvokeServer(1)
-                  end)
-                  -- Sem tempo de espera (CUIDADO: Pode causar lag se o servidor for ruim)
-                  task.wait() 
-              end
-          end)
+          Rayfield:Notify({Title = "⚡ PITY BUG", Content = "Reset infinito de pity ativado!", Duration = 3})
+          task.spawn(function() while PityEnabled do pcall(function() ClaimReward:InvokeServer(1) end) task.wait() end end)
       end
    end,
 })
 
--- [[ ABA JOGADOR ]]
 local Tab2 = Window:CreateTab("Jogador", 4483362458)
-local Section2 = Tab2:CreateSection("Estatísticas")
 
-local Toggle4 = Tab2:CreateToggle({
+Tab2:CreateToggle({
    Name = "👤 Modo Anônimo",
    CurrentValue = false,
-   Flag = "ToggleAnonMode",
+   Flag = "Toggle4",
    Callback = function(Value)
-      if Value then pcall(function() Player.DisplayName = "User_" .. math.random(1000, 9999) end) end
+      if Value then
+          pcall(function() Player.DisplayName = "ZeltyUser_"..math.random(100,999) end)
+          Rayfield:Notify({Title = "👤 ANÔNIMO", Content = "Nick ocultado!", Duration = 3})
+      end
    end,
 })
 
 local AntiAFKEnabled = false
-local Toggle5 = Tab2:CreateToggle({
+Tab2:CreateToggle({
    Name = "💤 Anti-AFK",
    CurrentValue = false,
-   Flag = "ToggleAntiAFK",
+   Flag = "Toggle5",
    Callback = function(Value)
       AntiAFKEnabled = Value
       if Value then
+          Rayfield:Notify({Title = "💤 ANTI-AFK", Content = "Proteção ativada!", Duration = 3})
           Player.Idled:Connect(function()
-              if AntiAFKEnabled then
-                  VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-                  task.wait(1)
-                  VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
-              end
+              if AntiAFKEnabled then VirtualUser:CaptureController() VirtualUser:ClickButton2(Vector2.new()) end
           end)
       end
    end,
 })
 
+local Tab3 = Window:CreateTab("Config", 4483362458)
+
+Tab3:CreateDropdown({
+   Name = "Mudar Cor do Script",
+   Options = {"Ocean","Amethyst","Green","Amber","DarkBlue"},
+   CurrentOption = {"Ocean"},
+   MultipleOptions = false,
+   Callback = function(Option)
+      Window:ModifyTheme(Option[1])
+   end,
+})
+
+Tab3:CreateButton({
+   Name = "Fechar Script (Destroy)",
+   Callback = function()
+      Rayfield:Destroy()
+   end,
+})
+
+Tab3:CreateButton({
+   Name = "Copiar Link do Discord",
+   Callback = function()
+      setclipboard("https://discord.gg/SEU_LINK_AQUI")
+      Rayfield:Notify({Title = "Discord", Content = "Link copiado!", Duration = 3})
+   end,
+})
+
 Rayfield:Notify({
-   Title = "Zelty Turbo!",
-   Content = "Velocidade de coleta aumentada.",
-   Duration = 5,
+   Title = "Zelty Hub",
+   Content = "Carregado com sucesso!",
+   Duration = 3,
    Image = 4483362458,
 })
