@@ -1,0 +1,241 @@
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local UserInputService = game:GetService("UserInputService")
+local Players = game:GetService("Players")
+local VirtualUser = game:GetService("VirtualUser")
+
+local Player = Players.LocalPlayer
+
+local ClaimReward = ReplicatedStorage
+    :WaitForChild("Packages")
+    :WaitForChild("_Index")
+    :WaitForChild("sleitnick_knit@1.7.0")
+    :WaitForChild("knit")
+    :WaitForChild("Services")
+    :WaitForChild("ChallengeService")
+    :WaitForChild("RF")
+    :WaitForChild("ClaimReward")
+
+-- GUI
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "ZeltyHub"
+
+local Main = Instance.new("Frame", ScreenGui)
+Main.Size = UDim2.new(0, 500, 0, 450)
+Main.Position = UDim2.new(0.5, -250, 0.5, -225)
+Main.BackgroundColor3 = Color3.fromRGB(10, 20, 40)
+Main.BorderSizePixel = 0
+Instance.new("UICorner", Main).CornerRadius = UDim.new(0, 18)
+
+-- 🔔 NOTIFICAÇÃO
+local function createNotification(text)
+	local Notif = Instance.new("TextLabel", ScreenGui)
+	Notif.Size = UDim2.new(0, 260, 0, 40)
+	Notif.Position = UDim2.new(1, 300, 1, -60)
+	Notif.BackgroundColor3 = Color3.fromRGB(0,170,255)
+	Notif.Text = text
+	Notif.TextColor3 = Color3.new(1,1,1)
+	Notif.Font = Enum.Font.GothamBold
+	Notif.TextSize = 14
+	Notif.BorderSizePixel = 0
+	Instance.new("UICorner", Notif).CornerRadius = UDim.new(0,10)
+
+	Notif:TweenPosition(UDim2.new(1, -270, 1, -60), "Out", "Quad", 0.3, true)
+
+	task.delay(2, function()
+		Notif:TweenPosition(UDim2.new(1, 300, 1, -60), "In", "Quad", 0.3, true)
+		task.wait(0.3)
+		Notif:Destroy()
+	end)
+end
+
+-- DRAG
+local dragging, dragInput, dragStart, startPos
+Main.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		dragging = true
+		dragStart = input.Position
+		startPos = Main.Position
+		input.Changed:Connect(function()
+			if input.UserInputState == Enum.UserInputState.End then
+				dragging = false
+			end
+		end)
+	end
+end)
+
+Main.InputChanged:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseMovement then
+		dragInput = input
+	end
+end)
+
+UserInputService.InputChanged:Connect(function(input)
+	if input == dragInput and dragging then
+		local delta = input.Position - dragStart
+		Main.Position = UDim2.new(
+			startPos.X.Scale,
+			startPos.X.Offset + delta.X,
+			startPos.Y.Scale,
+			startPos.Y.Offset + delta.Y
+		)
+	end
+end)
+
+-- TITLE
+local Title = Instance.new("TextLabel", Main)
+Title.Size = UDim2.new(1, -20, 0, 40)
+Title.Position = UDim2.new(0, 10, 0, 10)
+Title.Text = "Zelty Hub ❄️"
+Title.TextColor3 = Color3.fromRGB(120, 200, 255)
+Title.BackgroundTransparency = 1
+Title.Font = Enum.Font.GothamBold
+Title.TextSize = 20
+Title.TextXAlignment = Enum.TextXAlignment.Left
+
+-- TOGGLE
+local function createToggle(name, posY, callback)
+	local Frame = Instance.new("Frame", Main)
+	Frame.Size = UDim2.new(1, -40, 0, 50)
+	Frame.Position = UDim2.new(0, 20, 0, posY)
+	Frame.BackgroundColor3 = Color3.fromRGB(20, 40, 70)
+	Frame.BorderSizePixel = 0
+	Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 12)
+
+	local Label = Instance.new("TextLabel", Frame)
+	Label.Size = UDim2.new(0.7, 0, 1, 0)
+	Label.Position = UDim2.new(0, 10, 0, 0)
+	Label.Text = name
+	Label.BackgroundTransparency = 1
+	Label.TextColor3 = Color3.fromRGB(255,255,255)
+	Label.Font = Enum.Font.Gotham
+	Label.TextSize = 14
+	Label.TextXAlignment = Enum.TextXAlignment.Left
+
+	local Toggle = Instance.new("TextButton", Frame)
+	Toggle.Size = UDim2.new(0, 60, 0, 25)
+	Toggle.Position = UDim2.new(1, -70, 0.5, -12)
+	Toggle.BackgroundColor3 = Color3.fromRGB(50, 80, 120)
+	Toggle.Text = "OFF"
+	Toggle.TextColor3 = Color3.new(1,1,1)
+	Toggle.Font = Enum.Font.GothamBold
+	Toggle.TextSize = 12
+	Instance.new("UICorner", Toggle).CornerRadius = UDim.new(1, 0)
+
+	local enabled = false
+
+	Toggle.MouseButton1Click:Connect(function()
+		enabled = not enabled
+		
+		Toggle.Text = enabled and "ON" or "OFF"
+		Toggle.BackgroundColor3 = enabled and Color3.fromRGB(0,170,255) or Color3.fromRGB(50,80,120)
+
+		createNotification(name .. ": " .. (enabled and "ON" or "OFF"))
+		
+		if callback then
+			callback(function() return enabled end)
+		end
+	end)
+end
+
+-- 🍀 AUTO LUCK
+createToggle("🍀 Auto Luck Spin", 70, function(getState)
+	task.spawn(function()
+		local i = 1
+		while getState() do
+			pcall(function()
+				ClaimReward:InvokeServer(i)
+			end)
+			i += 1
+			if i > 1000 then i = 1 end
+			task.wait(0.02)
+		end
+	end)
+end)
+
+-- 🔒 ANTI BAN
+createToggle("🔒 Anti-Ban", 130, function() end)
+
+-- ⚡ PITY
+createToggle("⚡ Pity Bugada", 190, function(getState)
+	task.spawn(function()
+		while getState() do
+			pcall(function()
+				ClaimReward:InvokeServer(1)
+			end)
+			task.wait(0.05)
+		end
+	end)
+end)
+
+-- 🔹 ABA JOGADOR
+local PlayerTab = Instance.new("Frame", Main)
+PlayerTab.Size = UDim2.new(1, -40, 0, 120)
+PlayerTab.Position = UDim2.new(0, 20, 0, 260)
+PlayerTab.BackgroundColor3 = Color3.fromRGB(20, 40, 70)
+PlayerTab.BorderSizePixel = 0
+Instance.new("UICorner", PlayerTab).CornerRadius = UDim.new(0, 12)
+
+local PlayerTitle = Instance.new("TextLabel", PlayerTab)
+PlayerTitle.Size = UDim2.new(1, -20, 0, 30)
+PlayerTitle.Position = UDim2.new(0, 10, 0, 5)
+PlayerTitle.Text = "Jogador"
+PlayerTitle.BackgroundTransparency = 1
+PlayerTitle.TextColor3 = Color3.fromRGB(255,255,255)
+PlayerTitle.Font = Enum.Font.GothamBold
+PlayerTitle.TextSize = 16
+PlayerTitle.TextXAlignment = Enum.TextXAlignment.Left
+
+local function createMiniToggle(parent, text, posY, callback)
+	local Frame = Instance.new("Frame", parent)
+	Frame.Size = UDim2.new(1, -20, 0, 35)
+	Frame.Position = UDim2.new(0, 10, 0, posY)
+	Frame.BackgroundColor3 = Color3.fromRGB(30, 50, 90)
+	Frame.BorderSizePixel = 0
+	Instance.new("UICorner", Frame).CornerRadius = UDim.new(0, 10)
+
+	local Label = Instance.new("TextLabel", Frame)
+	Label.Size = UDim2.new(0.7, 0, 1, 0)
+	Label.Position = UDim2.new(0, 10, 0, 0)
+	Label.Text = text
+	Label.BackgroundTransparency = 1
+	Label.TextColor3 = Color3.new(1,1,1)
+	Label.Font = Enum.Font.Gotham
+	Label.TextSize = 13
+	Label.TextXAlignment = Enum.TextXAlignment.Left
+
+	local Toggle = Instance.new("TextButton", Frame)
+	Toggle.Size = UDim2.new(0, 50, 0, 20)
+	Toggle.Position = UDim2.new(1, -60, 0.5, -10)
+	Toggle.BackgroundColor3 = Color3.fromRGB(80, 60, 120)
+	Toggle.Text = ""
+	Instance.new("UICorner", Toggle).CornerRadius = UDim.new(1, 0)
+
+	local enabled = false
+
+	Toggle.MouseButton1Click:Connect(function()
+		enabled = not enabled
+		Toggle.BackgroundColor3 = enabled and Color3.fromRGB(170,100,255) or Color3.fromRGB(80,60,120)
+		createNotification(text .. ": " .. (enabled and "ON" or "OFF"))
+		if callback then callback(enabled) end
+	end)
+end
+
+-- 🔒 ANÔNIMO
+createMiniToggle(PlayerTab, "Modo Anônimo", 40, function(state)
+	if state then
+		pcall(function()
+			Player.DisplayName = "User_" .. math.random(1000,9999)
+		end)
+	end
+end)
+
+-- 💤 ANTI AFK
+createMiniToggle(PlayerTab, "Anti-AFK", 80, function(state)
+	if state then
+		Player.Idled:Connect(function()
+			VirtualUser:Button2Down(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+			task.wait(1)
+			VirtualUser:Button2Up(Vector2.new(0,0), workspace.CurrentCamera.CFrame)
+		end)
+	end
+end)
